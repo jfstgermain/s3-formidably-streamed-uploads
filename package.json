@@ -1,0 +1,36 @@
+{
+  "name": "s3-formidably-streamed-uploads",
+  "version": "0.0.1",
+  "description": "Wrapper around knox, knox-mpu and formidable to ease file upload directly to s3 without writing to disk",
+  "main": "lib/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "knox": "~0.4.5",
+    "knox-mpu": "~0.0.4",
+    "formidable": "~1.0.11"
+  },
+  "devDependencies": {
+    "should": "~1.2.1",
+    "coffee-script": "~1.4.0",
+    "mocha": "~1.7.4",
+    "rimraf": "~2.0.3",
+    "mockstream": "0.0.0"
+  },
+  "scripts": {
+    "prepublish": "cake build",
+    "test": "mocha test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jfstgermain/s3-formidably-streamed-uploads.git"
+  },
+  "keywords": [
+    "s3",
+    "streaming",
+    "upload"
+  ],
+  "author": "Jean-François St-Germain",
+  "license": "MIT"
+}

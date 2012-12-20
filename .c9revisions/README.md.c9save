@@ -1,3 +1,4 @@
 {"ts":1356017762519,"silentsave":true,"restoring":false,"patch":[[]],"length":0}
 {"contributors":[],"silentsave":false,"ts":1356017781192,"patch":[[{"diffs":[[1,"## s3-formidably-streamed-uploads"]],"start1":0,"start2":0,"length1":0,"length2":33}]],"length":33,"saved":false}
 {"ts":1356017993880,"patch":[[{"diffs":[[0,"-uploads"],[1,"\nWraps knox, knox-mpu and formidable for easy streaming of file uploads directly to S3 without touching the hard drive"]],"start1":25,"start2":25,"length1":8,"length2":126}]],"length":151,"saved":false}
+{"contributors":[],"silentsave":false,"ts":1356026809983,"patch":[[{"diffs":[[0,"rd drive"],[1,"\n\nsee: http://anders.janmyr.com/2012/04/writing-node-module.html"]],"start1":143,"start2":143,"length1":8,"length2":72}]],"length":215,"saved":false}
