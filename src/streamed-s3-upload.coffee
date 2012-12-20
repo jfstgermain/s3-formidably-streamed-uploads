@@ -29,8 +29,7 @@ module.exports = (options) ->
   handleFilePart = (readStream, cb) ->
     # TODO: verify that processPart's signature is ok b4 proceeding
     processPart readStream, (err, readStreams) ->
-      async.map readStreams, pushToS3, (err, results) ->
-        cb err, results
+      async.map readStreams, pushToS3, cb
       
       
     # https://groups.google.com/forum/?fromgroups=#!topic/nodejs/Avf95ibIqHo
@@ -42,7 +41,7 @@ module.exports = (options) ->
         cb err
     ###
       
-  handleImageUpload = (req, res, next) ->
+  handleFileUpload = (req, res, next) ->
     form = new formidable.IncomingForm()
 
     form.keepExtensions = true
