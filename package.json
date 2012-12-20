@@ -9,7 +9,8 @@
   "dependencies": {
     "knox": "~0.4.5",
     "knox-mpu": "~0.0.4",
-    "formidable": "~1.0.11"
+    "formidable": "~1.0.11",
+    "async": "~0.1.22"
   },
   "devDependencies": {
     "should": "~1.2.1",
