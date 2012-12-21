@@ -40,24 +40,27 @@ module.exports = (options) ->
       (err) ->
         cb err
     ###
-      
-  handleFileUpload = (req, res, next) ->
+  
+  handleFileUpload = (req, done) ->
     form = new formidable.IncomingForm()
 
     form.keepExtensions = true
     form.uploadDir = process.env.TMP || process.env.TMPDIR || process.env.TEMP || '/tmp' || process.cwd()
+    # TODO: Why use event handlers? Just call done in 'onPart'
+    form.on 's3-upload-completed', (s3res) ->
+      done null, s3res
+    
+    form.on 'error', (err) ->
+      done err, null
+      
     form.onPart = (part) ->
       console.log '**onPart'
       if not part.filename then form.handlePart part
       else
-        handleFilePart part, (err, res) ->
-          if err?
-            console.error err
-            @emit 'error', err
-          else @emit 'end'
+        handleFilePart part, (err, s3res) ->
+          if err? then form.emit 'error', err
+          else form.emit 's3-upload-completed', null, s3res
 
-    form.parse req, (err, fields, files) ->
-      if err?
-        console.dir err
-        next err
-      else next()
+    form.parse req
+
+  return handleFileUpload: handleFileUpload
