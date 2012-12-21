@@ -1,5 +1,6 @@
 ## s3-formidably-streamed-uploads
 Wraps knox, knox-mpu and formidable for easy streaming of file uploads directly to S3 without touching the hard drive
+knox-mpu was modified so no temp parts are saved to disk but to an in memory buffer
 
 **IMPORTANT: Take note that when used as an express middlewear, it needs to be the first in a list of many**
 
