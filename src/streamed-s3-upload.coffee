@@ -18,10 +18,10 @@ module.exports = (options) ->
     done null, [part]
     
   pushToS3 = (readStream, cb) ->
-    console.time "[ image-uploader-helper ] Pushing to S3"
+    console.log "[ image-uploader-helper ] Pushing to S3"
 
     mpu = new MultiPartUpload
-      client: global.knoxClient
+      client: options.knoxClient
       objectName: readStream.filename
       stream: readStream
       cb
@@ -45,7 +45,7 @@ module.exports = (options) ->
     form = new formidable.IncomingForm()
 
     form.keepExtensions = true
-    form.uploadDir = process.env.TMP || process.env.TMPDIR || process.env.TEMP || '/tmp' || process.cwd()
+    #form.uploadDir = process.env.TMP || process.env.TMPDIR || process.env.TEMP || '/tmp' || process.cwd()
     # TODO: Why use event handlers? Just call done in 'onPart'
     form.on 's3-upload-completed', (s3res) ->
       done null, s3res

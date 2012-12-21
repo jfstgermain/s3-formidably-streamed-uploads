@@ -5,20 +5,37 @@ knox = require 'knox'
 MultiPartUpload = require 'knox-mpu'
 should = require 'should'
 s3auth = require './s3auth.json'
+StreamS3upload = require '../lib/streamed-s3-upload'
 mockstream = require 'mockstream'
 
 server = http.createServer()
+port = 13532
 
 describe 'Formidable / knox multipart form uploads', ->
-  client = null;
+  knoxClient = null;
     
   before (done) ->
     try 
-      client = knox.createClient s3auth
+      knoxClient = knox.createClient s3auth
       done()
     catch err
       done 'Could not create Knox client - please provide an ./s3auth.json file'
     
+  it 'should be able to pipe parts without demuxing', (done) ->
+    socket = net.createConnection port
+    file = fs.createReadStream "#{__dirname}/fixtures/400.png"
+    
+    server.listen port, ->
+      server.once 'request', (req, res) ->
+        new streamS3upload = StreamS3upload 
+          knoxClient: knoxClient
+          
+        streamS3upload.handleFileUpload req, (err, s3res) ->
+          done()
+          
+      file.pipe socket    
+
+  ###
   it 'should be able to pipe a stream directly to Amazon S3 using the multi part upload', (done) ->
     testLength = 7242880
     chunkSize = 2048
@@ -43,3 +60,4 @@ describe 'Formidable / knox multipart form uploads', ->
           else done()
            
     stream.start()
+  ###
