@@ -22,6 +22,7 @@ describe 'Formidable / knox multipart form uploads', ->
       done 'Could not create Knox client - please provide an ./s3auth.json file'
     
   it 'should be able to pipe parts without demuxing', (done) ->
+    # TODO: Clean up in S3 after...
     socket = net.createConnection port
     file = fs.createReadStream "#{__dirname}/fixtures/400.png"
     
