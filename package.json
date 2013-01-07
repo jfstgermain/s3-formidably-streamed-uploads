@@ -2,7 +2,7 @@
   "name": "s3-formidably-streamed-uploads",
   "version": "0.0.1",
   "description": "Wrapper around knox, knox-mpu and formidable to ease file upload directly to s3 without writing to disk",
-  "main": "lib/index.js",
+  "main": "lib/streamed-s3-upload.js",
   "directories": {
     "test": "test"
   },
