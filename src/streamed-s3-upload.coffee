@@ -46,6 +46,7 @@ module.exports = (options) ->
         cb err
     ###
   unlinkTempfile = (file, form) ->
+    console.info "[ streamed-s3-upload ] unlinking #{file.path}"
     fs.unlink file.path, (err) ->
       if err?
         form.emit 'error', error       
@@ -57,7 +58,7 @@ module.exports = (options) ->
     #form.uploadDir = process.env.TMP || process.env.TMPDIR || process.env.TEMP || '/tmp' || process.cwd()
     # TODO: Why use event handlers? Just call done in 'onPart'
     form.on 's3-upload-completed', (s3res) ->
-      console.log "[ streamed-s3-upload ] finished uploading"
+      console.info "[ streamed-s3-upload ] finished uploading"
       done null, s3res
     
     form.on 'error', (err) ->
