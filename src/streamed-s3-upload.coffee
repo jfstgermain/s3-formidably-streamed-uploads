@@ -17,6 +17,7 @@ fs = require 'fs'
 module.exports = (options) ->
   options = options || {}
 
+  options.uploadDir = options.uploadDir || null
   options.processFile = options.processFile || (file, done) ->
     done null, [ fs.createReadStream file.path ]
     
@@ -52,7 +53,8 @@ module.exports = (options) ->
         form.emit 'error', error       
             
   handleFileUpload = (req, done) ->
-    form = new formidable.IncomingForm()
+    form = new formidable.IncomingForm
+      uploadDir: options.uploadDir
 
     form.keepExtensions = true
     #form.uploadDir = process.env.TMP || process.env.TMPDIR || process.env.TEMP || '/tmp' || process.cwd()
