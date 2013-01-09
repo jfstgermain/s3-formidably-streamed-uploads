@@ -45,7 +45,11 @@ module.exports = (options) ->
       (err) ->
         cb err
     ###
-  
+  unlinkTempfile = (file, form) ->
+    fs.unlink file.path, (err) ->
+      if err?
+        form.emit 'error', error       
+            
   handleFileUpload = (req, done) ->
     form = new formidable.IncomingForm()
 
@@ -67,13 +71,20 @@ module.exports = (options) ->
     
     form.on 'fileBegin', (name, file) ->
       console.info "[ streamed-s3-upload ] file begins uploading"
-      handleFile file, (err, s3res) ->
-        if err? 
-          console.dir err
-          form.emit 'error', err
-        else 
-          console.dir s3res
-          form.emit 's3-upload-completed', null, s3res
+      try
+        handleFile file, (err, s3res) ->
+          if err? 
+            console.dir err
+            form.emit 'error', err
+          else 
+            console.dir s3res
+            form.emit 's3-upload-completed', null, s3res
+            
+          unlinkTempfile file, form  
+      catch error
+        form.emit 'error', error
+        unlinkTempfile file, form
+        
     ###
     form.onPart = (part) ->
       console.log '**onPart'
