@@ -3,6 +3,7 @@ formidable = require 'formidable'
 knox = require 'knox'
 MultiPartUpload = require 'knox-mpu'
 util = require 'util'
+fs = require 'fs'
 
 # @see:
 # https://github.com/Obvious/pipette
@@ -57,14 +58,26 @@ module.exports = (options) ->
       console.error err
       done err, null
       
+    ###
+    Lookup the 'file' or 'fileBegin' events instead:
+    https://github.com/felixge/node-formidable#file
+    ###
+    
+    form.on 'fileBegin', (name, file) ->
+      fs.create
+    ###
     form.onPart = (part) ->
       console.log '**onPart'
       if not part.filename then form.handlePart part
       else
-        handleFilePart part, (err, s3res) ->
-          if err? then form.emit 'error', err
-          else form.emit 's3-upload-completed', null, s3res
-
+        handleFilePart part, (err, s3res) ->          
+          if err? 
+            console.dir err
+            form.emit 'error', err
+          else 
+            console.dir s3res
+            form.emit 's3-upload-completed', null, s3res
+    ###
     form.parse req
 
   return handleFileUpload: handleFileUpload
