@@ -72,7 +72,8 @@ module.exports = (options) ->
     https://github.com/felixge/node-formidable#file
     ###
     
-    form.on 'fileBegin', (name, file) ->
+    #form.on 'fileBegin', (name, file) ->
+    form.on 'file', (name, file) ->
       console.info "[ streamed-s3-upload ] file begins uploading"
       try
         handleFile file, (err, s3res) ->
