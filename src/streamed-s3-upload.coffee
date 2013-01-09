@@ -17,8 +17,8 @@ fs = require 'fs'
 module.exports = (options) ->
   options = options || {}
 
-  options.processPart = options.processPart || (part, done) ->
-    done null, [part]
+  options.processFile = options.processFile || (file, done) ->
+    done null, [ fs.createReadStream file.path ]
     
   pushToS3 = (readStream, cb) ->
     console.log "[ streamed-s3-upload ] Pushing to S3 (#{readStream.filename})"
@@ -29,10 +29,12 @@ module.exports = (options) ->
       stream: readStream
       cb
       
-  handleFilePart = (readStream, cb) ->
-    # TODO: verify that processPart's signature is ok b4 proceeding (array of streams)
-    options.processPart readStream, (err, readStreams) ->
-      async.map readStreams, pushToS3, cb
+  handleFile = (file, cb) ->
+    options.processFile file, (err, readStreams) ->
+      if not Array.isArray readStreams 
+        readStreams = [ readStreams ]
+        
+      async.map readStreams, pushToS3, cb   
       
       
     # https://groups.google.com/forum/?fromgroups=#!topic/nodejs/Avf95ibIqHo
@@ -64,7 +66,14 @@ module.exports = (options) ->
     ###
     
     form.on 'fileBegin', (name, file) ->
-      fs.create
+      console.info "[ streamed-s3-upload ] file begins uploading"
+      handleFile file, (err, s3res) ->
+        if err? 
+          console.dir err
+          form.emit 'error', err
+        else 
+          console.dir s3res
+          form.emit 's3-upload-completed', null, s3res
     ###
     form.onPart = (part) ->
       console.log '**onPart'
