@@ -75,7 +75,6 @@ module.exports = (options) ->
     #form.on 'fileBegin', (name, file) ->
     form.on 'file', (name, file) ->
       console.info "[ streamed-s3-upload ] file begins uploading"
-      ###
       try
         handleFile file, (err, s3res) ->
           if err? 
@@ -89,7 +88,6 @@ module.exports = (options) ->
       catch error
         form.emit 'error', error
         unlinkTempfile file, form
-      ###
         
     ###
     form.onPart = (part) ->
