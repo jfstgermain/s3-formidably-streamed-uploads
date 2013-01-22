@@ -4,6 +4,7 @@ knox = require 'knox'
 MultiPartUpload = require 'knox-mpu'
 util = require 'util'
 fs = require 'fs'
+BufferedStream = require('morestreams').BufferedStream
 
 # @see:
 # https://github.com/Obvious/pipette
@@ -18,8 +19,10 @@ module.exports = (options) ->
   options = options || {}
 
   options.uploadDir = options.uploadDir || null
-  options.processFile = options.processFile || (file, done) ->
-    done null, [ fs.createReadStream file.path ]
+  options.processFilePart = options.processFilePart || (filePartStream, done) ->
+    bufferedStream = new BufferedStream()
+    filePartStream.pipe bufferedStream
+    done null, [ bufferedStream ]
     
   pushToS3 = (readStream, cb) ->
     console.log "[ streamed-s3-upload ] Pushing to S3 (#{readStream.filename})"
@@ -30,8 +33,9 @@ module.exports = (options) ->
       stream: readStream
       cb
       
-  handleFile = (file, cb) ->
-    options.processFile file, (err, readStreams) ->
+  handleFilePart = (filePartStream, cb) ->
+    
+    options.processFilePart filePartStream, (err, readStreams) ->
       if not Array.isArray readStreams 
         readStreams = [ readStreams ]
         
@@ -64,6 +68,7 @@ module.exports = (options) ->
       done null, s3res
     
     form.on 'error', (err) ->
+      console.info "[ streamed-s3-upload ] an error occured"
       console.error err
       done err, null
       
@@ -72,8 +77,8 @@ module.exports = (options) ->
     https://github.com/felixge/node-formidable#file
     ###
     
-    #form.on 'fileBegin', (name, file) ->
-    form.on 'file', (name, file) ->
+    ###  
+    form.on 'fileBegin', (name, file) ->
       console.info "[ streamed-s3-upload ] file begins uploading"
       try
         handleFile file, (err, s3res) ->
@@ -84,24 +89,26 @@ module.exports = (options) ->
             console.dir s3res
             form.emit 's3-upload-completed', null, s3res
             
-          unlinkTempfile file, form  
+          #unlinkTempfile file, form  
       catch error
         form.emit 'error', error
-        unlinkTempfile file, form
-        
+        #unlinkTempfile file, form
     ###
+    
     form.onPart = (part) ->
-      console.log '**onPart'
-      if not part.filename then form.handlePart part
-      else
-        handleFilePart part, (err, s3res) ->          
-          if err? 
-            console.dir err
-            form.emit 'error', err
-          else 
-            console.dir s3res
-            form.emit 's3-upload-completed', null, s3res
-    ###
+      console.info "[ streamed-s3-upload ] onPart begin"
+      try 
+        if not part.filename then form.handlePart part
+        else
+          handleFilePart part, (err, s3res) ->          
+            if err? 
+              form.emit 'error', err
+            else 
+              console.dir s3res
+              form.emit 's3-upload-completed', null, s3res
+      catch error
+        form.emit 'error', error
+            
     form.parse req
 
   return handleFileUpload: handleFileUpload
