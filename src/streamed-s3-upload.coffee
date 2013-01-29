@@ -20,6 +20,8 @@ module.exports = (options) ->
 
   options.uploadDir = options.uploadDir || null
   options.processFilePart = options.processFilePart || (filePartStream, done) ->
+    console.log "**** in processFilepart"
+
     bufferedStream = new BufferedStream()
     filePartStream.pipe bufferedStream
     done null, [ bufferedStream ]
@@ -34,8 +36,9 @@ module.exports = (options) ->
       cb
       
   handleFilePart = (filePartStream, cb) ->
-    
+    console.log "**** handle file part"    
     options.processFilePart filePartStream, (err, readStreams) ->
+      console.log "**** processFilePart"
       if not Array.isArray readStreams 
         readStreams = [ readStreams ]
         
@@ -97,10 +100,11 @@ module.exports = (options) ->
     
     form.onPart = (part) ->
       console.info "[ streamed-s3-upload ] onPart begin"
-      try 
+      try
         if not part.filename then form.handlePart part
         else
-          handleFilePart part, (err, s3res) ->          
+          console.log "**** IN ELSE"
+          handleFilePart part, (err, s3res) ->    
             if err? 
               form.emit 'error', err
             else 
