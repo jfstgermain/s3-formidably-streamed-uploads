@@ -22,9 +22,12 @@ module.exports = (options) ->
   options.processFilePart = options.processFilePart || (filePartStream, done) ->
     console.log "**** in processFilepart"
 
+    ###
     bufferedStream = new BufferedStream()
+    bufferedStream.filename = filePartStream.filename
     filePartStream.pipe bufferedStream
-    done null, [ bufferedStream ]
+    ###
+    done null, [ filePartStream ]
     
   pushToS3 = (readStream, cb) ->
     console.log "[ streamed-s3-upload ] Pushing to S3 (#{readStream.filename})"
