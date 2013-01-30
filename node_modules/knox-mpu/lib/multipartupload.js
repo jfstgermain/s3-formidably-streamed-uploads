@@ -159,9 +159,11 @@ MultiPartUpload.prototype._handleStream = function(stream, callback) {
 
     // Handle the end of the stream
     stream.on('end', function() {
+        /*
         if (current) {
             partReady(current);
         }
+        */
         
         // Wait for the completion of the uploads
         return mpu._completeUploads(callback);
