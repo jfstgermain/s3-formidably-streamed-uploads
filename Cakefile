@@ -38,6 +38,12 @@ debug = (cb) ->
     coffeeCall 'w'
     #execCommand 'nodemon', ['--debug','--delay','7','--watch', 'lib'], cb
 
+git = (cb) ->
+  build ->
+    execCommand 'git', ['add', '.'], ->
+      execCommand 'git', ['commit', '-am', '\'...\''], ->
+        execCommand 'git', ['push'], cb
+
 task 'clean', 'Clean compiled js files in \'lib\'', ->
   clean ->
     console.log '\'lib\' cleaned.'
@@ -47,5 +53,8 @@ task 'build', 'Build lib/ from src/', ->
 
 task 'watch', 'Build and watch files', ->
   local()
+
+task 'git', 'Push changes to github', ->
+  git()
 
 # https://github.com/TrevorBurnham/connect-assets/blob/master/Cakefile
