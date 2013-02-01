@@ -20,8 +20,6 @@ module.exports = (options) ->
 
   options.uploadDir = options.uploadDir || null
   options.processFilePart = options.processFilePart || (filePartStream, done) ->
-    console.log "**** in processFilepart"
-
     ###
     bufferedStream = new BufferedStream()
     bufferedStream.filename = filePartStream.filename
@@ -39,7 +37,6 @@ module.exports = (options) ->
       cb
       
   handleFilePart = (filePartStream, cb) ->
-    console.log "**** handle file part"    
     options.processFilePart filePartStream, (err, readStreams) ->
       console.log "**** processFilePart"
       if not Array.isArray readStreams 
@@ -71,7 +68,6 @@ module.exports = (options) ->
     # TODO: Why use event handlers? Just call done in 'onPart'
     form.on 's3-upload-completed', (s3res) ->
       console.info "[ streamed-s3-upload ] finished uploading"
-      console.dir s3res
       done null, s3res
     
     form.on 'error', (err) ->
@@ -112,7 +108,6 @@ module.exports = (options) ->
             if err? 
               form.emit 'error', err
             else 
-              console.dir s3res
               form.emit 's3-upload-completed', s3res
       catch error
         form.emit 'error', error
