@@ -71,6 +71,7 @@ module.exports = (options) ->
     # TODO: Why use event handlers? Just call done in 'onPart'
     form.on 's3-upload-completed', (s3res) ->
       console.info "[ streamed-s3-upload ] finished uploading"
+      console.dir s3res
       done null, s3res
     
     form.on 'error', (err) ->
@@ -112,7 +113,7 @@ module.exports = (options) ->
               form.emit 'error', err
             else 
               console.dir s3res
-              form.emit 's3-upload-completed', null, s3res
+              form.emit 's3-upload-completed', s3res
       catch error
         form.emit 'error', error
             
