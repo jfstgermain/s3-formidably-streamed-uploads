@@ -79,6 +79,7 @@ module.exports = (options) ->
 
     form.on 'end', ->
       console.log '********** ENDED'
+      console.dir filesMeta
       done null, filesMeta
       
     ###
