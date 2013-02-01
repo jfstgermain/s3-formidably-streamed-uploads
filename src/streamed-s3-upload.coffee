@@ -74,6 +74,9 @@ module.exports = (options) ->
       console.info "[ streamed-s3-upload ] an error occured"
       console.error err
       done err, null
+
+    form.on 'end', ->
+      console.log '********** ENDED'
       
     ###
     Lookup the 'file' or 'fileBegin' events instead:
