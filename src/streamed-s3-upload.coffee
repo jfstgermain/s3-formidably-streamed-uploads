@@ -60,6 +60,7 @@ module.exports = (options) ->
         form.emit 'error', error       
             
   handleFileUpload = (req, done) ->
+    filesMeta = []
     form = new formidable.IncomingForm
       uploadDir: options.uploadDir
 
@@ -68,7 +69,8 @@ module.exports = (options) ->
     # TODO: Why use event handlers? Just call done in 'onPart'
     form.on 's3-upload-completed', (s3res) ->
       console.info "[ streamed-s3-upload ] finished uploading"
-      done null, s3res
+      filesMeta.push s3res
+      #done null, s3res
     
     form.on 'error', (err) ->
       console.info "[ streamed-s3-upload ] an error occured"
@@ -77,6 +79,7 @@ module.exports = (options) ->
 
     form.on 'end', ->
       console.log '********** ENDED'
+      done null, filesMeta
       
     ###
     Lookup the 'file' or 'fileBegin' events instead:
