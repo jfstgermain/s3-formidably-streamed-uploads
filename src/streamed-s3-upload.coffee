@@ -70,6 +70,9 @@ module.exports = (options) ->
     form.on 's3-upload-completed', (s3res) ->
       console.info "[ streamed-s3-upload ] finished uploading"
       filesMeta.push s3res
+      form._flushing--
+      form._maybeEnd()
+
       #done null, s3res
     
     form.on 'error', (err) ->
@@ -110,7 +113,7 @@ module.exports = (options) ->
       try
         if not part.filename then form.handlePart part
         else
-          console.log "**** IN ELSE"
+          form._flushing++
           handleFilePart part, (err, s3res) ->    
             if err? 
               form.emit 'error', err
