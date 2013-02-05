@@ -30,11 +30,9 @@ module.exports = (options) ->
   pushToS3 = (readStream, cb) ->
     console.log "[ streamed-s3-upload ] Pushing to S3 (#{readStream.filename})"
 
-    mpu = new MultiPartUpload
-      client: options.knoxClient
-      objectName: readStream.filename
-      stream: readStream
-      cb
+    options.objectName = readStream.filename 
+    options.stream = readStream
+    mpu = new MultiPartUpload options, cb
       
   handleFilePart = (filePartStream, cb) ->
     options.processFilePart filePartStream, (err, readStreams) ->
@@ -45,14 +43,7 @@ module.exports = (options) ->
       async.map readStreams, pushToS3, cb   
       
       
-    # https://groups.google.com/forum/?fromgroups=#!topic/nodejs/Avf95ibIqHo
-    ###
-    async.forEach thumbnailSizes,
-      (size, cb) ->
-        saveThumbnail part, size, cb
-      (err) ->
-        cb err
-    ###
+  # https://groups.google.com/forum/?fromgroups=#!topic/nodejs/Avf95ibIqHo
   unlinkTempfile = (file, form) ->
     console.info "[ streamed-s3-upload ] unlinking #{file.path}"
     fs.unlink file.path, (err) ->
@@ -72,8 +63,6 @@ module.exports = (options) ->
       filesMeta.push s3res
       form._flushing--
       form._maybeEnd()
-
-      #done null, s3res
     
     form.on 'error', (err) ->
       console.info "[ streamed-s3-upload ] an error occured"
@@ -81,32 +70,7 @@ module.exports = (options) ->
       done err, null
 
     form.on 'end', ->
-      console.log '********** ENDED'
-      console.dir filesMeta
       done null, filesMeta
-      
-    ###
-    Lookup the 'file' or 'fileBegin' events instead:
-    https://github.com/felixge/node-formidable#file
-    ###
-    
-    ###  
-    form.on 'fileBegin', (name, file) ->
-      console.info "[ streamed-s3-upload ] file begins uploading"
-      try
-        handleFile file, (err, s3res) ->
-          if err? 
-            console.dir err
-            form.emit 'error', err
-          else 
-            console.dir s3res
-            form.emit 's3-upload-completed', null, s3res
-            
-          #unlinkTempfile file, form  
-      catch error
-        form.emit 'error', error
-        #unlinkTempfile file, form
-    ###
     
     form.onPart = (part) ->
       console.info "[ streamed-s3-upload ] onPart begin"
