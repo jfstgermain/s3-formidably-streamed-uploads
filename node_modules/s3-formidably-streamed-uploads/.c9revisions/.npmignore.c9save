@@ -1,0 +1,2 @@
+{"ts":1356029223210,"silentsave":true,"restoring":false,"patch":[[]],"length":0}
+{"contributors":[],"silentsave":false,"ts":1356029241197,"patch":[[{"diffs":[[1,"lib-cov\r\n*.seed\r\n*.log\r\n*.csv\r\n*.dat\r\n*.out\r\n*.pid\r\n*.gz\r\n\r\npids\r\nlogs\r\nresults\r\n\r\nnode_modules\r\nnpm-debug.log\r\ntest/s3auth.json"]],"start1":0,"start2":0,"length1":0,"length2":128}]],"length":128,"saved":false}
