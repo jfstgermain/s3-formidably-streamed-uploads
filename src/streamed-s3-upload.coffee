@@ -32,6 +32,19 @@ module.exports = (options) ->
 
     options.objectName = readStream.filename 
     options.stream = readStream
+
+    if readStream.size?
+      size = readStream.size.split 'x'
+      if size?.length > 0
+        size = 
+          width: size[0]
+          height: size[1]
+      else
+        size = readStream.size
+
+      options.metaInfo = 
+        size: size
+
     mpu = new MultiPartUpload options, cb
       
   handleFilePart = (filePartStream, cb) ->

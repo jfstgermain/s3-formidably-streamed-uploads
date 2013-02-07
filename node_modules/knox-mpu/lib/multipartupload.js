@@ -24,6 +24,7 @@ function MultiPartUpload(opts, callback) {
  
     this.objectName = opts.objectName;
     this.headers = opts.headers || {};
+    this.metaInfo = opts.metaInfo || {};
     this.client = opts.client;
     this.partSize = opts.partSize || 5242880; // 5MB default
     this.uploadId = null;
@@ -241,6 +242,7 @@ MultiPartUpload.prototype._completeUploads = function(callback) {
             if (err) return callback(err);        
             delete body.$;
             body.size = size;
+            body.metaInfo: mpu.metaInfo;
             mpu.emit('completed', body);
             return callback(null, body);
         });
