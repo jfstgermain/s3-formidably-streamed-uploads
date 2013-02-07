@@ -242,7 +242,7 @@ MultiPartUpload.prototype._completeUploads = function(callback) {
             if (err) return callback(err);        
             delete body.$;
             body.size = size;
-            body.metaInfo: mpu.metaInfo;
+            body.metaInfo = mpu.metaInfo;
             mpu.emit('completed', body);
             return callback(null, body);
         });
