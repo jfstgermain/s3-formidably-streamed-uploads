@@ -19,18 +19,16 @@ module.exports = (options) ->
   options = options || {}
 
   options.processFilePart = options.processFilePart || (filePartStream, done) ->
-    ###
-    bufferedStream = new BufferedStream()
-    bufferedStream.filename = filePartStream.filename
-    filePartStream.pipe bufferedStream
-    ###
     done null, [ filePartStream ]
+
+  options.getUploadPath = options.getUploadPath || (fileSetName) ->
+    "#{fileSetName}"
     
-  pushToS3 = (readStream, cb) ->
+  pushToS3 = (readStream, s3UploadPath, cb) ->
     console.log "[ streamed-s3-upload ] Pushing to S3 (#{readStream.filename})"
 
     mpuOptions = 
-      objectName: "#{options.uploadDir}/#{readStream.filename}"
+      objectName: "#{s3UploadPath}/#{readStream.filename}"
       stream: readStream
       processFilePart: options.processFilePart
       client: options.client
@@ -43,12 +41,14 @@ module.exports = (options) ->
     mpu = new MultiPartUpload mpuOptions, cb
       
   handleFilePart = (filePartStream, cb) ->
+    s3UploadPath = options.getUploadPath filePartStream.filename
+
     options.processFilePart filePartStream, (err, readStreams) ->
       console.log "**** processFilePart"
       if not Array.isArray readStreams 
         readStreams = [ readStreams ]
         
-      async.map readStreams, pushToS3, cb   
+      async.map readStreams, ((readStream, cb2) -> pushToS3 readStream, s3UploadPath, cb2), cb   
       
       
   # https://groups.google.com/forum/?fromgroups=#!topic/nodejs/Avf95ibIqHo
