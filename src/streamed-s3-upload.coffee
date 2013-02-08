@@ -18,7 +18,6 @@ BufferedStream = require('morestreams').BufferedStream
 module.exports = (options) ->
   options = options || {}
 
-  options.uploadDir = options.uploadDir || null
   options.processFilePart = options.processFilePart || (filePartStream, done) ->
     ###
     bufferedStream = new BufferedStream()
@@ -30,14 +29,16 @@ module.exports = (options) ->
   pushToS3 = (readStream, cb) ->
     console.log "[ streamed-s3-upload ] Pushing to S3 (#{readStream.filename})"
 
-    options.objectName = readStream.filename 
-    options.stream = readStream
+    mpuOptions = 
+      objectName: "#{options.uploadDir}/#{readStream.filename }"
+      stream: readStream
+      processFilePart: options.processFilePart
 
     if readStream.size?
-      options.metaInfo = 
+      mpuOptions.metaInfo = 
         size: readStream.size
 
-    mpu = new MultiPartUpload options, cb
+    mpu = new MultiPartUpload mpuOptions, cb
       
   handleFilePart = (filePartStream, cb) ->
     options.processFilePart filePartStream, (err, readStreams) ->
