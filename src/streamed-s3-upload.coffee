@@ -30,9 +30,11 @@ module.exports = (options) ->
     console.log "[ streamed-s3-upload ] Pushing to S3 (#{readStream.filename})"
 
     mpuOptions = 
-      objectName: "#{options.uploadDir}/#{readStream.filename }"
+      objectName: "#{options.uploadDir}/#{readStream.filename}"
       stream: readStream
       processFilePart: options.processFilePart
+      client: options.client
+      headers: options.headers
 
     if readStream.size?
       mpuOptions.metaInfo = 
