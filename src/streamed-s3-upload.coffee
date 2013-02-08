@@ -5,6 +5,7 @@ MultiPartUpload = require 'knox-mpu'
 util = require 'util'
 fs = require 'fs'
 BufferedStream = require('morestreams').BufferedStream
+logger = require 'winston'
 
 # @see:
 # https://github.com/Obvious/pipette
@@ -27,6 +28,7 @@ module.exports = (options) ->
   pushToS3 = (readStream, s3UploadPath, cb) ->
     console.log "[ streamed-s3-upload ] Pushing to S3 (#{readStream.filename})"
 
+    logger.profile 'pushToS3'
     mpuOptions = 
       objectName: "#{s3UploadPath}/#{readStream.filename}"
       stream: readStream
@@ -38,7 +40,9 @@ module.exports = (options) ->
       mpuOptions.metaInfo = 
         size: readStream.size
 
-    mpu = new MultiPartUpload mpuOptions, cb
+    mpu = new MultiPartUpload mpuOptions, (err, res) -> 
+      logger.profile 'pushToS3'
+      cb err, res
       
   handleFilePart = (filePartStream, cb) ->
     s3UploadPath = options.getUploadPath filePartStream.filename
